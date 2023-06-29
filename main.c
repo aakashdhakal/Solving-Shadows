@@ -2,10 +2,12 @@
 #include <stdlib.h>
 #include <conio.h>
 #include <string.h>
+#include "gameStory.h"
 
 char inventoryObject[20];
 int lives = 3;
 char currentRoom[20];
+char message[500];
 
 struct inventory
 {
@@ -67,17 +69,43 @@ void gameDetails()
 }
 void mainGame()
 {
-    printf("\n You awaken in a dimly lit room, disoriented and unsure of how you ended up here.");
-    printf(" The air is heavy with an eerie silence broken only by the faint sound of whispers echoing through the mansion's halls.");
-    printf(" As you try to gather your thoughts, you realize that you are trapped inside a mysterious mansion, its secrets shrouded  in darkness.");
-    printf(" The room you find yourself in is adorned with faded wallpaper and antique furniture, a mirror on the wall reflecting your bewildered expression.");
-    printf(" \n Your first instinct is to escape this eerie place, to uncover the truth behind its enigmatic presence.\n");
-    printf("\n");
+
+    int input, hasKey = 0;
+    system("cls");
+    gameDetails();
+    firstStory();
+    printf("%s", message);
+
+    do
+    {
+        printf("\n Enter your choice: ");
+        scanf("%d", &input);
+        switch (input)
+        {
+        case 1:
+            strcpy(message, " You carefully search the room, examining every nook and cranny.\n After a thorough search, you notice a small painting on the wall that seems out of place.\n You take it off the wall and find a key hidden behind it!\n");
+            strcpy(inventoryObject, "Key");
+            hasKey = 1;
+            inventoryAction(1);
+            break;
+        case 2:
+            if (hasKey == 0)
+            {
+                strcpy(message, "\n The door is locked. You need to find a key first.\n");
+                break;
+            }
+            else
+            {
+                strcpy(message, "\n You insert the key into the door's lock and turn it. The door creaks open.\n Congratulations! You've escaped from the room!\n");
+                break;
+            }
+        }
+    } while (input != 2);
+    mainGame();
 }
 
 int main()
 {
-    gameDetails();
     mainGame();
     return 0;
 }
