@@ -4,6 +4,8 @@
 #include <string.h>
 
 char inventoryObject[20];
+int lives = 3;
+char currentRoom[20];
 
 struct inventory
 {
@@ -23,12 +25,12 @@ void vline(char ch, int n)
     printf("\n");
 }
 
-void inventoryAction(int n)
+int inventoryAction(int n)
 {
     if (n == 1)
     {
         Inventory *items = (Inventory *)malloc(sizeof(Inventory));
-        strcpy(items->itemName, "Knife");
+        strcpy(items->itemName, inventoryObject);
         items->next = NULL;
         if (inventoryHead == NULL)
         {
@@ -43,27 +45,39 @@ void inventoryAction(int n)
             }
             temp->next = items;
         }
-
-        printf("%s added to inventory\n", items->itemName);
     }
 }
 void gameDetails()
 {
     Inventory *items = inventoryHead;
     vline('-', 120);
-    printf("Inventory: ");
+    printf(" Inventory: ");
+    if (inventoryHead == NULL)
+    {
+        printf("Empty");
+    }
     while (items != NULL)
     {
-        printf("%s ", items->itemName);
+        printf(" %s ", items->itemName);
         items = items->next;
     }
+    printf("\t\t\t\t\t\t\t\t\t\t\t       Lives: %d", lives);
     printf("\n");
     vline('-', 120);
+}
+void mainGame()
+{
+    printf("\n You awaken in a dimly lit room, disoriented and unsure of how you ended up here.");
+    printf(" The air is heavy with an eerie silence broken only by the faint sound of whispers echoing through the mansion's halls.");
+    printf(" As you try to gather your thoughts, you realize that you are trapped inside a mysterious mansion, its secrets shrouded  in darkness.");
+    printf(" The room you find yourself in is adorned with faded wallpaper and antique furniture, a mirror on the wall reflecting your bewildered expression.");
+    printf(" \n Your first instinct is to escape this eerie place, to uncover the truth behind its enigmatic presence.\n");
+    printf("\n");
 }
 
 int main()
 {
-    inventoryAction(1);
     gameDetails();
+    mainGame();
     return 0;
 }
