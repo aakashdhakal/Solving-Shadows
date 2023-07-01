@@ -1,56 +1,115 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <conio.h>
+#include <string.h>
+#define MAX 1000
 
-int main()
+struct choice
 {
-    int hasKey = 0; // Variable to track if the player has the key
-    char input;
+    char choice[MAX];
+    struct choice *nextChoice;
+};
+typedef struct choice Choice;
 
-    printf("Welcome to 'Escape from the Enigma Manor'!\n");
-    printf("You find yourself trapped in a dimly lit room within the mysterious manor.\n");
-    printf("Your first task is to find a key to unlock the door and escape.\n");
+struct story
+{
+    char description[MAX];
+    struct story *choice1;
+    struct story *choice2;
+    Choice *choiceListHead;
+};
+typedef struct story Story;
 
-    while (1)
+Story *createStory(char description[])
+{
+    Story *newStory = (Story *)malloc(sizeof(Story));
+    strcpy(newStory->description, description);
+    newStory->choice1 = NULL;
+    newStory->choice2 = NULL;
+    newStory->choiceListHead = NULL;
+
+    return newStory;
+}
+
+void addStory(char description[], int choice, Story *story)
+{
+    Story *newStory = createStory(description);
+    if (choice == 1)
     {
-        printf("\nWhat would you like to do?\n");
-        printf("1. Look around the room\n");
-        printf("2. Open the door\n");
-        printf("3. Quit the game\n");
+        story->choice1 = newStory;
+    }
+    else if (choice == 2)
+    {
+        story->choice2 = newStory;
+    }
+}
 
-        input = getch();
-        printf("%c\n", input);
+void displayChoice(Choice *choiceListHead)
+{
+    Choice *temp = choiceListHead;
+    int i = 1;
+    while (temp != NULL)
+    {
+        printf("%d. %s\n", i, temp->choice);
+        temp = temp->nextChoice;
+        i++;
+    }
+}
 
-        switch (input)
+void addChoice(char choice[], Story *story)
+{
+    Choice *newChoice = (Choice *)malloc(sizeof(Choice));
+    strcpy(newChoice->choice, choice);
+    newChoice->nextChoice = NULL;
+
+    if (story->choiceListHead == NULL)
+    {
+        story->choiceListHead = newChoice;
+    }
+    else
+    {
+        Choice *temp = story->choiceListHead;
+        while (temp->nextChoice != NULL)
         {
-        case '1':
-            printf("You carefully search the room, examining every nook and cranny.\n");
-            printf("After a thorough search, you notice a small painting on the wall that seems out of place.\n");
-            printf("You take it off the wall and find a key hidden behind it!\n");
-            hasKey = 1; // Player found the key
-            break;
+            temp = temp->nextChoice;
+        }
+        temp->nextChoice = newChoice;
+    }
+}
 
-        case '2':
-            if (hasKey)
+void deleteChoice(char *choice, Story *story)
+{
+    Choice *temp = story->choiceListHead;
+    Choice *prev = NULL;
+    while (temp != NULL)
+    {
+        if (strcmp(temp->choice, choice) == 0)
+        {
+            if (prev == NULL)
             {
-                printf("You insert the key into the door's lock and turn it. The door creaks open.\n");
-                printf("Congratulations! You've escaped from the room!\n");
+                story->choiceListHead = temp->nextChoice;
             }
             else
             {
-                printf("The door is locked. You need to find a key first.\n");
+                prev->nextChoice = temp->nextChoice;
             }
-            break;
-
-        case '3':
-            printf("Thank you for playing 'Escape from the Enigma Manor'!\n");
-            exit(0);
-
-        default:
-            printf("Invalid input. Please try again.\n");
+            free(temp);
             break;
         }
+        prev = temp;
+        temp = temp->nextChoice;
     }
+}
+
+void gameStory()
+{
+    Story *start = createStory("You wake up in a mysterious room. There are two doors in front of you. Which one do you choose?");
+    addChoice("Door 1", start);
+    addChoice("Door 2", start);
+}
+
+int main()
+{
+    gameStory();
 
     return 0;
 }
