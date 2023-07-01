@@ -10,6 +10,10 @@ int lives = 3;
 char currentRoom[20];
 int exitRoom = 0;
 char message[500];
+int hasKey = 0;
+
+void firstLevel();
+void wrapperFunction(int n);
 
 void vline(char ch, int n)
 {
@@ -40,37 +44,63 @@ void gameDetails()
     vline('-', 120);
 }
 
-void consoleOutput(void (*func)())
+void consoleOutput(void (*func)(int), int value)
 {
     printf("\033[2J\033[1;1H");
     gameDetails();
-    func();
+    func(value);
 }
 void firstLevel()
 {
-    gameStory(1);
     int choice;
-    do
+    printf("%s", message);
+    printf(" \n 1. Search the room\n");
+    printf(" 2. Open the door\n");
+    printf("\n What do you want to do?: ");
+    scanf("%d", &choice);
+    switch (choice)
     {
-        printf(" \n 1. Search the room\n");
-        printf(" 2. Open the door\n");
-        printf("%s", message);
-        printf("\n What do you want to do?:");
-        scanf("%d", &choice);
-        switch (choice)
+    case 1:
+        if (hasKey == 0)
         {
-        case 1:
-            strcpy(message, "");
-            strcpy(currentRoom, "firstLevel");
-            searchRoom();
-            break;
+            strcpy(message, " You carefully search the room, examining every nook and cranny.\n After a thorough search, you notice a small painting on the wall that seems out of place.\n You take it off the wall and find a key hidden behind it!\n");
+            hasKey = 1;
+            strcpy(inventoryObject, "Key");
+            addToInventory();
         }
-        while (exitRoom == 0)
-            ;
+        else
+        {
+            strcpy(message, " You search the room again, but find nothing of interest.\n");
+        }
+        break;
+    case 2:
+        if (hasKey == 0)
+        {
+            strcpy(message, " The door is locked. You need to find a key.\n");
+        }
+        else
+        {
+            strcpy(message, " You use the key to unlock the door and escape the room.\n");
+            deleteFromInventory();
+            exitRoom = 1;
+        }
+        break;
+    default:
+        strcpy(message, " You have no choice to perform this action\n");
+        break;
     }
-
-    int main()
+    consoleOutput(wrapperFunction, 1);
+}
+void wrapperFunction(int n)
+{
+    if (n == 1)
     {
-        consoleOutput(firstLevel);
-        return 0;
+        firstLevel();
     }
+}
+int main()
+{
+    consoleOutput(gameStory, 1);
+    firstLevel();
+    return 0;
+}
