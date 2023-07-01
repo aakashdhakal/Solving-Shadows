@@ -1,21 +1,15 @@
+#include "checkpoints.h"
+#include "inventory.h"
+#include "gameStory.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <conio.h>
 #include <string.h>
-#include "gameStory.h"
 
-char inventoryObject[20];
 int lives = 3;
 char currentRoom[20];
+int exitRoom = 0;
 char message[500];
-
-struct inventory
-{
-    char itemName[20];
-    struct inventory *next;
-};
-typedef struct inventory Inventory;
-Inventory *inventoryHead = NULL;
 
 void vline(char ch, int n)
 {
@@ -27,28 +21,6 @@ void vline(char ch, int n)
     printf("\n");
 }
 
-int inventoryAction(int n)
-{
-    if (n == 1)
-    {
-        Inventory *items = (Inventory *)malloc(sizeof(Inventory));
-        strcpy(items->itemName, inventoryObject);
-        items->next = NULL;
-        if (inventoryHead == NULL)
-        {
-            inventoryHead = items;
-        }
-        else
-        {
-            Inventory *temp = inventoryHead;
-            while (temp->next != NULL)
-            {
-                temp = temp->next;
-            }
-            temp->next = items;
-        }
-    }
-}
 void gameDetails()
 {
     Inventory *items = inventoryHead;
@@ -67,45 +39,38 @@ void gameDetails()
     printf("\n");
     vline('-', 120);
 }
-void mainGame()
+
+void consoleOutput(void (*func)())
 {
-
-    int input, hasKey = 0;
-    system("cls");
+    printf("\033[2J\033[1;1H");
     gameDetails();
-    firstStory();
-    printf("%s", message);
-
+    func();
+}
+void firstLevel()
+{
+    gameStory(1);
+    int choice;
     do
     {
-        printf("\n Enter your choice: ");
-        scanf("%d", &input);
-        switch (input)
+        printf(" \n 1. Search the room\n");
+        printf(" 2. Open the door\n");
+        printf("%s", message);
+        printf("\n What do you want to do?:");
+        scanf("%d", &choice);
+        switch (choice)
         {
         case 1:
-            strcpy(message, " You carefully search the room, examining every nook and cranny.\n After a thorough search, you notice a small painting on the wall that seems out of place.\n You take it off the wall and find a key hidden behind it!\n");
-            strcpy(inventoryObject, "Key");
-            hasKey = 1;
-            inventoryAction(1);
+            strcpy(message, "");
+            strcpy(currentRoom, "firstLevel");
+            searchRoom();
             break;
-        case 2:
-            if (hasKey == 0)
-            {
-                strcpy(message, "\n The door is locked. You need to find a key first.\n");
-                break;
-            }
-            else
-            {
-                strcpy(message, "\n You insert the key into the door's lock and turn it. The door creaks open.\n Congratulations! You've escaped from the room!\n");
-                break;
-            }
         }
-    } while (input != 2);
-    mainGame();
-}
+        while (exitRoom == 0)
+            ;
+    }
 
-int main()
-{
-    mainGame();
-    return 0;
-}
+    int main()
+    {
+        consoleOutput(firstLevel);
+        return 0;
+    }
