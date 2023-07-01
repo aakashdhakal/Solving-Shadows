@@ -15,6 +15,7 @@ int hasKey = 0;
 void firstLevel();
 void wrapperFunction(int n);
 
+// This function is used to display horizontal charaters in the console
 void vline(char ch, int n)
 {
     int i;
@@ -24,7 +25,7 @@ void vline(char ch, int n)
     }
     printf("\n");
 }
-
+// This function is used to display the current game details like lives, inventory at the top of the console
 void gameDetails()
 {
     Inventory *items = inventoryHead;
@@ -44,12 +45,15 @@ void gameDetails()
     vline('-', 120);
 }
 
+// This function is used whenever the console has to be updated
 void consoleOutput(void (*func)(int), int value)
 {
     printf("\033[2J\033[1;1H");
     gameDetails();
     func(value);
 }
+
+// This function is the first level of the game
 void firstLevel()
 {
     int choice;
@@ -63,7 +67,7 @@ void firstLevel()
     case 1:
         if (hasKey == 0)
         {
-            strcpy(message, " You carefully search the room, examining every nook and cranny.\n After a thorough search, you notice a small painting on the wall that seems out of place.\n You take it off the wall and find a key hidden behind it!\n");
+            strcpy(message, " You carefully search the room, examining every nook and cranny.\n After a thorough search, you notice a small painting on the wall that seems out of place.\n You take it off the wall and find a key hidden behind it!\n Suddenly you saw a shadow that just disappeared from the passage.\n");
             hasKey = 1;
             strcpy(inventoryObject, "Key");
             addToInventory();
@@ -89,8 +93,15 @@ void firstLevel()
         strcpy(message, " You have no choice to perform this action\n");
         break;
     }
+    if (exitRoom == 1)
+    {
+        system("pause");
+        consoleOutput(gameStory, 2);
+    }
     consoleOutput(wrapperFunction, 1);
 }
+
+// This function wraps the non parametric function to a parametric function
 void wrapperFunction(int n)
 {
     if (n == 1)
@@ -98,6 +109,8 @@ void wrapperFunction(int n)
         firstLevel();
     }
 }
+
+// This is the main function
 int main()
 {
     consoleOutput(gameStory, 1);
