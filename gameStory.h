@@ -7,9 +7,6 @@ struct story
     char description[1000];
     struct story *choice1;
     struct story *choice2;
-    struct story *choice3;
-    struct story *choice4;
-    struct story *choice5;
 };
 typedef struct story Story;
 Story *storyHead = NULL;
@@ -20,9 +17,32 @@ Story *createStory(char description[1000])
     strcpy(newStory->description, description);
     newStory->choice1 = NULL;
     newStory->choice2 = NULL;
-    newStory->choice3 = NULL;
-    newStory->choice4 = NULL;
-    newStory->choice5 = NULL;
 
     return newStory;
+}
+
+void addStory(char description[1000], int choice, Story *story)
+{
+    Story *newStory = createStory(description);
+    if (choice == 1)
+    {
+        story->choice1 = newStory;
+    }
+    else if (choice == 2)
+    {
+        story->choice2 = newStory;
+    }
+}
+
+void displayStory(Story *story)
+{
+    printf("%s\n", story->description);
+    if (story->choice1 != NULL)
+    {
+        printf("1. %s\n", story->choice1->description);
+    }
+    if (story->choice2 != NULL)
+    {
+        printf("2. %s\n", story->choice2->description);
+    }
 }
