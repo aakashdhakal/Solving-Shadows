@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #define MAX 1000
 
 // Global variables
@@ -8,6 +9,7 @@ int lives = 3;
 char currentRoom[MAX];
 int exitRoom = 0;
 char message[MAX];
+int id = 1;
 
 struct choice
 {
@@ -29,14 +31,37 @@ Inventory *inventoryHead = NULL;
 struct story
 {
     char description[MAX];
+    int nodeId;
     struct story *choice1;
     struct story *choice2;
     Choice *choiceListHead;
 };
 typedef struct story Story;
-
 Story *rootNode = NULL;
 
+struct checkpoint
+{
+    Story *node;
+    struct checkpoint *next;
+};
+typedef struct checkpoint Checkpoint;
+Checkpoint *checkpointHead = NULL;
+
+// push the node to checkpoint stack
+void pushCheckpoint(Story *node)
+{
+    Checkpoint *newCheckpoint = (Checkpoint *)malloc(sizeof(Checkpoint));
+    newCheckpoint->node = node;
+    newCheckpoint->next = checkpointHead;
+    checkpointHead = newCheckpoint;
+}
+
+void popCheckpoint()
+{
+    Checkpoint *temp = checkpointHead;
+    checkpointHead = checkpointHead->next;
+    free(temp);
+}
 // Function to display the choices
 void displayChoice(Choice *node)
 {
@@ -170,7 +195,7 @@ void updateConsole()
 {
     printf("\033[2J\033[1;1H");
     vline('-', 120);
-    printf("Inventory: ");
+    printf("  Inventory: ");
     displayInventory();
     printf("\t\t\t\t\t\t\t\t\t\t\t       Lives: %d", lives);
     printf("\n");
@@ -181,6 +206,7 @@ Story *addTreeNode(char description[])
 {
     Story *node = (Story *)malloc(sizeof(Story));
     strcpy(node->description, description);
+    node->nodeId = id++;
     node->choiceListHead = NULL;
     node->choice1 = NULL;
     node->choice2 = NULL;
@@ -227,6 +253,49 @@ void createStory()
     addChoiceToStory(node2, "Run away from the room");
     rootNode->choice2 = node2;
 }
+Story *searchNodeByID(Story *currentStory, int targetID)
+{
+    if (currentStory == NULL)
+        return NULL;
+
+    if (currentStory->nodeId == targetID)
+        return currentStory;
+
+    Story *foundNode = searchNodeByID(currentStory->choice1, targetID);
+    if (foundNode == NULL)
+        foundNode = searchNodeByID(currentStory->choice2, targetID);
+
+    return foundNode;
+}
+
+void saveGameProgress(Story *currentStory)
+{
+    FILE *file = fopen("game_progress.txt", "w");
+    if (file == NULL)
+    {
+        printf("Error opening file\n");
+        return;
+    }
+    fprintf(file, "%d\n", currentStory->nodeId);
+
+    fclose(file);
+}
+
+Story *loadGameProgress()
+{
+    FILE *file = fopen("game_progress.txt", "r");
+    if (file == NULL)
+    {
+        printf("Error opening file\n");
+        return 0;
+    }
+
+    int targetID;
+    fscanf(file, "%d", &targetID);
+    fclose(file);
+
+    return searchNodeByID(rootNode, targetID);
+}
 
 void playGame(Story *currentStory)
 {
@@ -259,15 +328,27 @@ void playGame(Story *currentStory)
     if (nextStory == NULL)
     {
         printf("Game Over\n");
+        saveGameProgress(rootNode);
         return;
     }
+    pushCheckpoint(currentStory);
+    saveGameProgress(nextStory);
     playGame(nextStory);
 }
 
 int main()
 {
     createStory();
-    playGame(rootNode);
+    FILE *file = fopen("game_progress.txt", "r");
+    if (file != NULL)
+    {
+        Story *currentStory = loadGameProgress();
+        playGame(currentStory);
+    }
+    else
+    {
+        playGame(rootNode);
+    }
 
     return 0;
 }
