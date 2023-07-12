@@ -10,6 +10,7 @@ char currentRoom[MAX];
 int exitRoom = 0;
 char message[MAX];
 int id = 1;
+char inventory[MAX];
 
 struct choice
 {
