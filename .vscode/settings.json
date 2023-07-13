@@ -1,0 +1,7 @@
+{
+	"files.associations": {
+		"*.embeddedhtml": "html",
+		"*.php": "php",
+		"stdio.h": "c"
+	}
+}

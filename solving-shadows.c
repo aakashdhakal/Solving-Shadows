@@ -1,6 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+
+#include "gameStory.h"
 
 #define MAX 1000
 
