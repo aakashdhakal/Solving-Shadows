@@ -1,5 +1,6 @@
-
-#include "gameStory.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define MAX 1000
 
@@ -69,7 +70,7 @@ void displayChoice(Choice *node)
     int i = 1;
     while (temp != NULL)
     {
-        printf("%d. %s\n", i, temp->choice);
+        printf(" %d. %s\n", i, temp->choice);
         temp = temp->nextChoice;
         i++;
     }
@@ -238,19 +239,19 @@ void addChoiceToStory(Story *story, char choice[])
 
 void createStory()
 {
-    rootNode = addTreeNode("You are in a dark room. There is a door to your left and right. Which one do you take?");
+    rootNode = addTreeNode(" You are in a dark room. There is a door to your left and right. Which one do you take?");
 
-    addChoiceToStory(rootNode, "Left");
-    addChoiceToStory(rootNode, "Right");
+    addChoiceToStory(rootNode, " Left");
+    addChoiceToStory(rootNode, " Right");
 
-    Story *node1 = addTreeNode("You find yourself in a forest. There is a wolf in front of you. Behind you is another door. What do you do?");
-    addChoiceToStory(node1, "Fight the wolf");
-    addChoiceToStory(node1, "Run towards the door");
+    Story *node1 = addTreeNode(" You find yourself in a forest. There is a wolf in front of you. Behind you is another door. What do you do?");
+    addChoiceToStory(node1, " Fight the wolf");
+    addChoiceToStory(node1, " Run towards the door");
     rootNode->choice1 = node1;
 
-    Story *node2 = addTreeNode("You enter a room with a mirror. You see a shadow behind you. What do you do?");
-    addChoiceToStory(node2, "Face the shadow");
-    addChoiceToStory(node2, "Run away from the room");
+    Story *node2 = addTreeNode(" You enter a room with a mirror. You see a shadow behind you. What do you do?");
+    addChoiceToStory(node2, " Face the shadow");
+    addChoiceToStory(node2, " Run away from the room");
     rootNode->choice2 = node2;
 }
 Story *searchNodeByID(Story *currentStory, int targetID)
@@ -307,7 +308,7 @@ void playGame(Story *currentStory)
 
     do
     {
-        printf("\nEnter your choice: ");
+        printf("\n Enter your choice: ");
         scanf("%d", &choice);
         if (choice < 1 || choice > 2)
         {
