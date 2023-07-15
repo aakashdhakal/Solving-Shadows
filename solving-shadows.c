@@ -10,11 +10,14 @@ char currentRoom[MAX];
 int exitRoom = 0;
 char message[MAX];
 int id = 1;
+int choiceId = 1;
 char inventory[MAX];
+int numberOfChoices;
 
 struct choice
 {
     char choice[MAX];
+    int choiceId;
     struct choice *nextChoice;
     struct choice *nextStory;
 };
@@ -67,29 +70,34 @@ void popCheckpoint()
 void displayChoice(Choice *node)
 {
     Choice *temp = node;
+    numberOfChoices = 0;
     int i = 1;
     while (temp != NULL)
     {
         printf(" %d. %s\n", i, temp->choice);
         temp = temp->nextChoice;
         i++;
+        numberOfChoices++;
     }
 }
 
 // Function to add choices
-void addChoice(Choice **listHead, char choice[])
+void addChoice(Story *story, char choice[])
 {
     Choice *newChoice = (Choice *)malloc(sizeof(Choice));
     strcpy(newChoice->choice, choice);
     newChoice->nextChoice = NULL;
     newChoice->nextStory = NULL;
-    if (*listHead == NULL)
+    newChoice->choiceId = choiceId;
+    choiceId++;
+
+    if (story->choiceListHead == NULL)
     {
-        *listHead = newChoice;
+        story->choiceListHead = newChoice;
     }
     else
     {
-        Choice *temp = *listHead;
+        Choice *temp = story->choiceListHead;
         while (temp->nextChoice != NULL)
         {
             temp = temp->nextChoice;
@@ -97,7 +105,6 @@ void addChoice(Choice **listHead, char choice[])
         temp->nextChoice = newChoice;
     }
 }
-
 // Function to delete choices
 void deleteChoice(char *choice)
 {
@@ -215,44 +222,22 @@ Story *addTreeNode(char description[])
     return node;
 }
 
-void addChoiceToStory(Story *story, char choice[])
-{
-    Choice *newChoice = (Choice *)malloc(sizeof(Choice));
-    strcpy(newChoice->choice, choice);
-    newChoice->nextChoice = NULL;
-    newChoice->nextStory = NULL;
-
-    if (story->choiceListHead == NULL)
-    {
-        story->choiceListHead = newChoice;
-    }
-    else
-    {
-        Choice *temp = story->choiceListHead;
-        while (temp->nextChoice != NULL)
-        {
-            temp = temp->nextChoice;
-        }
-        temp->nextChoice = newChoice;
-    }
-}
-
 void createStory()
 {
-    rootNode = addTreeNode(" You are in a dark room. There is a door to your left and right. Which one do you take?");
+    rootNode = addTreeNode(" You are in a dark room. There is a door to your left and right. What will you do?");
 
-    addChoiceToStory(rootNode, " Left");
-    addChoiceToStory(rootNode, " Right");
+    addChoice(rootNode, " Search the room");
+    addChoice(rootNode, " Open the door");
 
     Story *node1 = addTreeNode(" You find yourself in a forest. There is a wolf in front of you. Behind you is another door. What do you do?");
-    addChoiceToStory(node1, " Fight the wolf");
-    addChoiceToStory(node1, " Run towards the door");
+    addChoice(node1, " Fight the wolf");
+    addChoice(node1, " Run towards the door");
     rootNode->choice1 = node1;
 
     Story *node2 = addTreeNode(" You enter a room with a mirror. You see a shadow behind you. What do you do?");
-    addChoiceToStory(node2, " Face the shadow");
-    addChoiceToStory(node2, " Run away from the room");
-    rootNode->choice2 = node2;
+    addChoice(node2, " Face the shadow");
+    addChoice(node2, " Run away from the room");
+    node1->choice1 = node2;
 }
 Story *searchNodeByID(Story *currentStory, int targetID)
 {
@@ -310,7 +295,7 @@ void playGame(Story *currentStory)
     {
         printf("\n Enter your choice: ");
         scanf("%d", &choice);
-        if (choice < 1 || choice > 2)
+        if (choice < 1 || choice > numberOfChoices)
         {
             printf("Invalid choice. Please enter again\n");
         }
