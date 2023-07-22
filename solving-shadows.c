@@ -24,7 +24,6 @@ struct choice
     struct choice *nextChoice;
 };
 typedef struct choice Choice;
-Choice *choiceHead = NULL;
 
 struct inventory
 {
@@ -75,6 +74,7 @@ void displayChoice(Choice *node)
     int i = 1;
     temp->choiceNumber = 1;
     numberOfChoices = 0;
+    printf("\n");
     while (temp != NULL)
     {
         temp->choiceNumber = i;
@@ -86,13 +86,15 @@ void displayChoice(Choice *node)
 }
 
 // Function to add choices
-void addChoice(Story *story, char choice[], int proceed)
+void addChoice(Story *story, char choice[], int proceed, char message[], char inventoryItem[], int isLifeDecrease)
 {
     Choice *newChoice = (Choice *)malloc(sizeof(Choice));
     strcpy(newChoice->choice, choice);
-    newChoice->nextChoice = NULL;
+    newChoice->nextChoice = NULL; // Set the nextChoice pointer to NULL for the last choice
     newChoice->isStoryNext = proceed;
-    newChoice->message[MAX] = NULL;
+    strcpy(newChoice->message, message); // Initialize the message to an empty string
+    strcpy(newChoice->inventoryItem, inventoryItem);
+    newChoice->isLifeDecrease = isLifeDecrease;
 
     if (story->choiceListHead == NULL)
     {
@@ -109,25 +111,25 @@ void addChoice(Story *story, char choice[], int proceed)
     }
 }
 // Function to delete choices
-void deleteChoice(Choice *choice, int choiceNumber)
+void deleteChoice(Story *story, int choiceNumber)
 {
-    Choice *temp = choice;
+    Choice *temp = story->choiceListHead;
     Choice *prev = NULL;
-    while (temp != NULL)
+    int i = 1;
+    while (temp->nextChoice != NULL)
     {
         if (temp->choiceNumber == choiceNumber)
         {
             if (prev == NULL)
             {
-                choiceHead = temp->nextChoice;
-                break;
+                story->choiceListHead = temp->nextChoice;
             }
             else
             {
                 prev->nextChoice = temp->nextChoice;
             }
             free(temp);
-            break;
+            return;
         }
         prev = temp;
         temp = temp->nextChoice;
@@ -230,17 +232,18 @@ void createStory()
 {
     rootNode = addTreeNode(" You are in a dark room. There is a door to your left and right. What will you do?");
 
-    addChoice(rootNode, " Search the room", 0);
-    addChoice(rootNode, " Open the door", 1);
+    addChoice(rootNode, " Search the room", 0, " You find a key", "Key", 0);
+    addChoice(rootNode, " Open the door", 1, " You need a key to open the door", "Key", 0);
 
     Story *node1 = addTreeNode(" You find yourself in a forest. There is a wolf in front of you. Behind you is another door. What do you do?");
-    addChoice(node1, " Fight the wolf", 0);
-    addChoice(node1, " Run towards the door", 1);
+    addChoice(node1, " Fight the wolf", 0, " You fought the wolf and lost. You lost a life", "", 1);
+    addChoice(node1, " Run towards the door", 1, " You need a key to open the door", "", 0);
     rootNode->choice1 = node1;
 
     Story *node2 = addTreeNode(" You enter a room with a mirror. You see a shadow behind you. What do you do?");
-    addChoice(node2, " Face the shadow", 0);
-    addChoice(node2, " Run away from the room", 1);
+    addChoice(node2, " Smash the mirror", 0, " You found sword in the mirror", "Sword", 0);
+    addChoice(node2, " Face the shadow", 0, " You fought the shadow and lost. You lost a life", "Sword", 1);
+    addChoice(node2, " Run away from the room", 1, "", "", 0);
     node1->choice1 = node2;
 }
 Story *searchNodeByID(Story *currentStory, int targetID)
@@ -291,13 +294,19 @@ void playGame(Story *currentStory)
 {
     updateConsole();
     printf("%s\n", currentStory->description);
-    Choice *userChoice = currentStory->choiceListHead;
-    displayChoice(userChoice);
+    Choice *userChoice;
     Story *nextStory = NULL;
     int choice;
-
     do
     {
+        userChoice = currentStory->choiceListHead;
+        if (message[0] != '\0')
+        {
+            printf("\n%s\n", message);
+            message[0] = '\0';
+        }
+
+        displayChoice(userChoice);
         printf("\n Enter your choice: ");
         scanf("%d", &choice);
         if (choice < 1 || choice > numberOfChoices)
@@ -314,18 +323,33 @@ void playGame(Story *currentStory)
                 }
                 userChoice = userChoice->nextChoice;
             }
-            if (userChoice->isStoryNext == 1)
+            if (userChoice->isStoryNext == 1 || userChoice->isStoryNext == 2)
             {
-                nextStory = currentStory->choice1;
-            }
-            else if (userChoice->isStoryNext == 2)
-            {
-                nextStory = currentStory->choice2;
+
+                if (userChoice->isStoryNext == 1)
+                {
+                    nextStory = currentStory->choice1;
+                }
+                else
+                {
+                    nextStory = currentStory->choice2;
+                }
             }
             else
             {
+                strcpy(message, userChoice->message);
+                deleteChoice(currentStory, userChoice->choiceNumber);
+                if (userChoice->inventoryItem[0] != '\0')
+                {
+                    addItem(userChoice->inventoryItem);
+                }
+                if (userChoice->isLifeDecrease == 1)
+                {
+                    lives--;
+                }
             }
         }
+        updateConsole();
     } while (userChoice->isStoryNext == 0);
     if (nextStory == NULL)
     {
