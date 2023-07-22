@@ -7,7 +7,7 @@
 // Global variables
 int lives = 3;
 char currentRoom[MAX];
-int exitRoom = 0;
+int repeat = 0;
 char message[MAX];
 int id = 1;
 char inventory[MAX];
@@ -188,8 +188,12 @@ void displayInventory()
     Inventory *temp = inventoryHead;
     while (temp != NULL)
     {
-        printf("%s\n", temp->itemName);
+        printf("%s ", temp->itemName);
         temp = temp->next;
+    }
+    if (inventoryHead == NULL)
+    {
+        printf("Empty");
     }
 }
 
@@ -211,7 +215,7 @@ void updateConsole()
     vline('-', 120);
     printf("  Inventory: ");
     displayInventory();
-    printf("\t\t\t\t\t\t\t\t\t\t\t       Lives: %d", lives);
+    printf("\n\n  Lives: %d", lives);
     printf("\n");
     vline('-', 120);
 }
@@ -292,17 +296,19 @@ Story *loadGameProgress()
 
 void playGame(Story *currentStory)
 {
+    repeat = 0;
     updateConsole();
-    printf("%s\n", currentStory->description);
+
     Choice *userChoice;
     Story *nextStory = NULL;
     int choice;
     do
     {
+        printf("%s\n", currentStory->description);
         userChoice = currentStory->choiceListHead;
         if (message[0] != '\0')
         {
-            printf("\n%s\n", message);
+            printf("\n !!! %s !!!\n", message);
             message[0] = '\0';
         }
 
@@ -311,10 +317,15 @@ void playGame(Story *currentStory)
         scanf("%d", &choice);
         if (choice < 1 || choice > numberOfChoices)
         {
-            printf("Invalid choice. Please enter again\n");
+            strcpy(message, " Invalid choice");
+        }
+        else if (repeat == choice)
+        {
+            strcpy(message, " You have already completed this action");
         }
         else
         {
+            repeat = choice;
             while (userChoice != NULL)
             {
                 if (userChoice->choiceNumber == choice)
@@ -338,7 +349,6 @@ void playGame(Story *currentStory)
             else
             {
                 strcpy(message, userChoice->message);
-                deleteChoice(currentStory, userChoice->choiceNumber);
                 if (userChoice->inventoryItem[0] != '\0')
                 {
                     addItem(userChoice->inventoryItem);
