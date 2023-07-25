@@ -186,15 +186,28 @@ void deleteItem(char *item)
 void displayInventory()
 {
     Inventory *temp = inventoryHead;
-    while (temp != NULL)
-    {
-        printf("%s ", temp->itemName);
-        temp = temp->next;
-    }
     if (inventoryHead == NULL)
     {
         printf("Empty");
     }
+    while (temp != NULL)
+    {
+        printf("%s | ", temp->itemName);
+        temp = temp->next;
+    }
+}
+char searchInventory(char item[])
+{
+    Inventory *temp = inventoryHead;
+    while (temp != NULL)
+    {
+        if (temp->itemName == item)
+        {
+            return *item;
+        }
+        temp = temp->next;
+    }
+    return -1;
 }
 
 // Function to display a horizontal line
@@ -298,7 +311,7 @@ void playGame(Story *currentStory)
 {
     repeat = 0;
     updateConsole();
-
+    int canAdvance = 0;
     Choice *userChoice;
     Story *nextStory = NULL;
     int choice;
@@ -336,6 +349,17 @@ void playGame(Story *currentStory)
             }
             if (userChoice->isStoryNext == 1 || userChoice->isStoryNext == 2)
             {
+                if (userChoice->inventoryItem != "")
+                {
+                    if (searchInventory(userChoice->inventoryItem) != -1)
+                    {
+                        deleteItem(userChoice->inventoryItem);
+                    }
+                    else
+                    {
+                        printf("You need %s to complete this action", userChoice->inventoryItem);
+                    }
+                }
 
                 if (userChoice->isStoryNext == 1)
                 {
@@ -360,7 +384,7 @@ void playGame(Story *currentStory)
             }
         }
         updateConsole();
-    } while (userChoice->isStoryNext == 0);
+    } while (userChoice->isStoryNext == 0 && canAdvance != 0);
     if (nextStory == NULL)
     {
         printf("Game Over\n");
