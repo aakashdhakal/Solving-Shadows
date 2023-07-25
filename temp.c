@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <conio.h>
 #define MAX 1000
 
 // Global variables
@@ -55,6 +56,8 @@ typedef struct checkpoint Checkpoint;
 Checkpoint *checkpointHead = NULL;
 
 void playGame(Story *);
+void startScreen();
+void helpScreen();
 
 // push the node to checkpoint stack
 void pushCheckpoint(Story *node)
@@ -257,7 +260,7 @@ void gameOver()
     scanf("%d", &choice);
     if (choice == 1)
     {
-
+        strcpy(message, "");
         playGame(rootNode);
     }
     else
@@ -460,19 +463,63 @@ void playGame(Story *currentStory)
     playGame(nextStory);
 }
 
-int main()
+void helpScreen()
 {
-    createStory();
-    FILE *file = fopen("game_progress.txt", "r");
-    if (file != NULL)
+    system("cls");
+    printf(" Help\n");
+    vline('-', 120);
+    printf("Use the number keys to select the choices\n");
+    printf("Press any key to go back to the main menu\n");
+    getch();
+    startScreen();
+}
+
+void startScreen()
+{
+    system("cls");
+    printf(R"EOF(
+
+                                 _____ _           _             _____                      
+                                / ____| |         (_)           / ____|                     
+                               | |    | |__   ___  _  ___ ___  | |  __  __ _ _ __ ___   ___ 
+                               | |    | '_ \ / _ \| |/ __/ _ \ | | |_ |/ _` | '_ ` _ \ / _ \
+                               | |____| | | | (_) | | (_|  __/ | |__| | (_| | | | | | |  __/
+                                \_____|_| |_|\___/|_|\___\___|  \_____|\__,_|_| |_| |_|\___|
+                                                              
+)EOF");
+    vline('-', 120);
+
+    printf(" 1. Play Game\n 2. Help\n 3. Quit Game\n");
+    int choice;
+    printf("\n Enter your choice: ");
+    scanf("%d", &choice);
+    if (choice == 1)
     {
-        Story *currentStory = loadGameProgress();
-        playGame(currentStory);
+        FILE *file = fopen("game_progress.txt", "r");
+        if (file != NULL)
+        {
+            Story *currentStory = loadGameProgress();
+            playGame(currentStory);
+        }
+        else
+        {
+            strcpy(message, "");
+            playGame(rootNode);
+        }
+    }
+    else if (choice == 2)
+    {
+        helpScreen();
     }
     else
     {
-        playGame(rootNode);
+        exit(0);
     }
+}
 
+int main()
+{
+    createStory();
+    startScreen();
     return 0;
 }
