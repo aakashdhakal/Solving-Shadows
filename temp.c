@@ -237,9 +237,13 @@ void updateConsole()
 {
 	//    printf("\033[2J\033[1;1H");
 	system("cls");
+		if(lives == 0){
+		exit(0);
+	}
 	vline('-', 120);
 	printf("  Inventory: ");
 	displayInventory();
+
 	printf("\n\n  Lives: %d", lives);
 	printf("\n");
 	vline('-', 120);
@@ -354,21 +358,24 @@ void playGame(Story *currentStory)
 
 				userChoice = userChoice->nextChoice;
 			}
-
-				userChoice->isCompleted = 1;
+			if(userChoice->isCompleted == 1){
+				strcpy(message,"You have already completed this action");
+				continue;
+			}
+				
 
 				if (userChoice->isStoryNext == 1 || userChoice->isStoryNext == 2)
 				{
-					if(userChoice->inventoryItem != ""){
-						if( searchItem(userChoice->inventoryItem) != "" ){
-							deleteItem(userChoice->inventoryItem);
-							canProceed = 1;
-						}
-						else{
-							strcpy(message, userChoice->message);
-							continue;
-						}
-					}
+//					if(userChoice->inventoryItem != ""){
+//						if( searchItem(userChoice->inventoryItem) != "" ){
+//							deleteItem(userChoice->inventoryItem);
+//							canProceed = 1;
+//						}
+//						else{
+//							strcpy(message, userChoice->message);
+//							continue;
+//						}
+//					}
 					if (userChoice->isStoryNext == 1)
 					{
 						nextStory = currentStory->choice1;
@@ -391,8 +398,10 @@ void playGame(Story *currentStory)
 					{
 						lives--;
 					}
+					userChoice->isCompleted = 1;
 				}
 			}
+			canProceed = 1;
 	} while (userChoice->isStoryNext == 0 || canProceed == 0);
 	if (nextStory == NULL)
 	{
