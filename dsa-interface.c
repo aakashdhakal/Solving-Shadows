@@ -1,16 +1,19 @@
-#include<stdio.h>
+#include <stdio.h>
 
-void vline(char ch,int n){
-	int i;
-	for(i=0;i<n;i++){
-		printf("%c",ch);
-	}
-	printf("\n");
+void vline(char ch, int n)
+{
+    int i;
+    for (i = 0; i < n; i++)
+    {
+        printf("%c", ch);
+    }
+    printf("\n");
 }
 
-int main(){
-	
- printf (R"EOF(
+int main()
+{
+
+    printf(R"EOF(
 
                                  _____ _           _             _____                      
                                 / ____| |         (_)           / ____|                     
@@ -20,8 +23,7 @@ int main(){
                                 \_____|_| |_|\___/|_|\___\___|  \_____|\__,_|_| |_| |_|\___|
                                                               
 )EOF");
-vline('-',120);
+    vline('-', 120);
 
-printf(" 1. Play Game\n 2. Help\n 3. Quit Game\n");
-                                                              
+    printf(" 1. Play Game\n 2. Help\n 3. Quit Game\n");
 }
