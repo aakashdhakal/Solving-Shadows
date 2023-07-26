@@ -420,7 +420,15 @@ void playGame(Story *currentStory)
 
             if (userChoice->isStoryNext == 1 || userChoice->isStoryNext == 2)
             {
-
+				if(userChoice->inventoryItem != ""){
+					char isItemPresent[MAX];
+					strcpy(isItemPresent,searchItem(userChoice->inventoryItem));
+					if(isItemPresent == ""){
+						sprintf(message,"You need %s to complete this action",userChoice->inventoryItem);
+						continue;
+					}
+					
+				}
                 if (userChoice->isStoryNext == 1)
                 {
                     nextStory = currentStory->choice1;
