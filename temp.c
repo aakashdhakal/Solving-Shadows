@@ -254,19 +254,18 @@ void gameOver()
 )EOF");
     vline('-', 120);
     printf(" !!! %s !!!\n", message);
-    printf(" 1. Play Again\n 2. Quit Game\n");
+    printf("\n 1. New Game\n 2. Reload last checkpoint\n 3. Quit to Main Menu\n");
     int choice;
     printf("\n Enter your choice: ");
     scanf("%d", &choice);
-    if (choice == 1)
-    {
-        strcpy(message, "");
-        playGame(rootNode);
-    }
-    else
-    {
-        exit(0);
-    }
+    switch(choice){
+    	case 1: playGame(rootNode);
+    			break;
+    	case 2: playGame(checkpointHead->node);
+    			break;
+    	case 3: startScreen();
+    			break;
+	}
 }
 
 // Function to update the status bar
@@ -489,32 +488,29 @@ void startScreen()
 )EOF");
     vline('-', 120);
 
-    printf(" 1. Play Game\n 2. Help\n 3. Quit Game\n");
+    printf(" 1. Resume Game\n 2. New Game\n 3. Help\n 4. Quit\n");
     int choice;
     printf("\n Enter your choice: ");
     scanf("%d", &choice);
-    if (choice == 1)
-    {
-        FILE *file = fopen("game_progress.txt", "r");
-        if (file != NULL)
-        {
-            Story *currentStory = loadGameProgress();
-            playGame(currentStory);
-        }
-        else
-        {
-            strcpy(message, "");
-            playGame(rootNode);
-        }
-    }
-    else if (choice == 2)
-    {
-        helpScreen();
-    }
-    else
-    {
-        exit(0);
-    }
+    FILE *file = fopen("game_progress.txt", "r");
+    switch(choice){
+    	case 1: 
+        		if (file != NULL) {
+            		Story *currentStory = loadGameProgress();
+            		fclose(file);
+            		playGame(currentStory);
+        		}
+        		else {
+            		printf("\n No saved file found");
+        		}
+        case 2: playGame(rootNode);
+        		break;
+        		
+        case 3: helpScreen();
+        		break;
+        		
+        case 4: exit(0);
+	}
 }
 
 int main()
