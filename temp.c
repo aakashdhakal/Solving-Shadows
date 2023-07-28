@@ -213,18 +213,19 @@ void displayInventory()
         printf("Empty");
     }
 }
-char *searchItem(char *item)
+// Function to check if an item is present in the inventory
+int isItemPresent(char *item)
 {
     Inventory *temp = inventoryHead;
     while (temp != NULL)
     {
-        if (temp->itemName == item)
+        if (strcmp(temp->itemName, item) == 0)
         {
-            return item;
+            return 1;
         }
+        temp = temp->next;
     }
-
-    return "";
+    return 0;
 }
 
 // Function to display a horizontal line
@@ -258,14 +259,18 @@ void gameOver()
     int choice;
     printf("\n Enter your choice: ");
     scanf("%d", &choice);
-    switch(choice){
-    	case 1: playGame(rootNode);
-    			break;
-    	case 2: playGame(checkpointHead->node);
-    			break;
-    	case 3: startScreen();
-    			break;
-	}
+    switch (choice)
+    {
+    case 1:
+        playGame(rootNode);
+        break;
+    case 2:
+        playGame(checkpointHead->node);
+        break;
+    case 3:
+        startScreen();
+        break;
+    }
 }
 
 // Function to update the status bar
@@ -406,9 +411,9 @@ void playGame(Story *currentStory)
                 {
                     break;
                 }
-
                 userChoice = userChoice->nextChoice;
             }
+
             if (userChoice->isCompleted == 1)
             {
                 if (userChoice->isLifeDecrease != 1)
@@ -420,15 +425,16 @@ void playGame(Story *currentStory)
 
             if (userChoice->isStoryNext == 1 || userChoice->isStoryNext == 2)
             {
-				if(userChoice->inventoryItem != ""){
-					char isItemPresent[MAX];
-					strcpy(isItemPresent,searchItem(userChoice->inventoryItem));
-					if(isItemPresent == ""){
-						sprintf(message,"You need %s to complete this action",userChoice->inventoryItem);
-						continue;
-					}
-					
-				}
+                if (strcmp(userChoice->inventoryItem, "") != 0)
+                {
+                    if (!isItemPresent(userChoice->inventoryItem))
+                    {
+                        sprintf(message, "You need %s to complete this action", userChoice->inventoryItem);
+                        continue;
+                    }
+                    deleteItem(userChoice->inventoryItem);
+                }
+
                 if (userChoice->isStoryNext == 1)
                 {
                     nextStory = currentStory->choice1;
@@ -437,11 +443,9 @@ void playGame(Story *currentStory)
                 {
                     nextStory = currentStory->choice2;
                 }
-                deleteItem(userChoice->inventoryItem);
             }
             else
             {
-
                 strcpy(message, userChoice->message);
                 if (userChoice->inventoryItem[0] != '\0')
                 {
@@ -457,6 +461,7 @@ void playGame(Story *currentStory)
         }
         canProceed = 1;
     } while (userChoice->isStoryNext == 0 || canProceed == 0);
+
     if (nextStory == NULL)
     {
         strcpy(message, " You have completed the game");
@@ -501,24 +506,30 @@ void startScreen()
     printf("\n Enter your choice: ");
     scanf("%d", &choice);
     FILE *file = fopen("game_progress.txt", "r");
-    switch(choice){
-    	case 1: 
-        		if (file != NULL) {
-            		Story *currentStory = loadGameProgress();
-            		fclose(file);
-            		playGame(currentStory);
-        		}
-        		else {
-            		printf("\n No saved file found");
-        		}
-        case 2: playGame(rootNode);
-        		break;
-        		
-        case 3: helpScreen();
-        		break;
-        		
-        case 4: exit(0);
-	}
+    switch (choice)
+    {
+    case 1:
+        if (file != NULL)
+        {
+            Story *currentStory = loadGameProgress();
+            fclose(file);
+            playGame(currentStory);
+        }
+        else
+        {
+            printf("\n No saved file found");
+        }
+    case 2:
+        playGame(rootNode);
+        break;
+
+    case 3:
+        helpScreen();
+        break;
+
+    case 4:
+        exit(0);
+    }
 }
 
 int main()
