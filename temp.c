@@ -402,62 +402,57 @@ void playGame(Story *currentStory)
         if (choice < 1 || choice > numberOfChoices)
         {
             strcpy(message, " Invalid choice");
+            continue;
         }
-        else
+        while (userChoice != NULL)
         {
-            while (userChoice != NULL)
+            if (userChoice->choiceNumber == choice)
             {
-                if (userChoice->choiceNumber == choice)
-                {
-                    break;
-                }
-                userChoice = userChoice->nextChoice;
+                break;
             }
+            userChoice = userChoice->nextChoice;
+        }
 
-            if (userChoice->isCompleted == 1)
+        if (userChoice->isCompleted == 1 && userChoice->isLifeDecrease != 1)
+        {
+            strcpy(message, "You have already completed this action");
+            continue;
+        }
+
+        if (userChoice->isStoryNext == 1 || userChoice->isStoryNext == 2)
+        {
+            if (strcmp(userChoice->inventoryItem, "") != 0)
             {
-                if (userChoice->isLifeDecrease != 1)
+                if (!isItemPresent(userChoice->inventoryItem))
                 {
-                    strcpy(message, "You have already completed this action");
+                    sprintf(message, "You need %s to complete this action", userChoice->inventoryItem);
                     continue;
                 }
+                deleteItem(userChoice->inventoryItem);
             }
 
-            if (userChoice->isStoryNext == 1 || userChoice->isStoryNext == 2)
+            if (userChoice->isStoryNext == 1)
             {
-                if (strcmp(userChoice->inventoryItem, "") != 0)
-                {
-                    if (!isItemPresent(userChoice->inventoryItem))
-                    {
-                        sprintf(message, "You need %s to complete this action", userChoice->inventoryItem);
-                        continue;
-                    }
-                    deleteItem(userChoice->inventoryItem);
-                }
-
-                if (userChoice->isStoryNext == 1)
-                {
-                    nextStory = currentStory->choice1;
-                }
-                else
-                {
-                    nextStory = currentStory->choice2;
-                }
+                nextStory = currentStory->choice1;
             }
             else
             {
-                strcpy(message, userChoice->message);
-                if (userChoice->inventoryItem[0] != '\0')
-                {
-                    addItem(userChoice->inventoryItem);
-                }
-
-                if (userChoice->isLifeDecrease == 1)
-                {
-                    lives--;
-                }
-                userChoice->isCompleted = 1;
+                nextStory = currentStory->choice2;
             }
+        }
+        else
+        {
+            strcpy(message, userChoice->message);
+            if (userChoice->inventoryItem[0] != '\0')
+            {
+                addItem(userChoice->inventoryItem);
+            }
+
+            if (userChoice->isLifeDecrease == 1)
+            {
+                lives--;
+            }
+            userChoice->isCompleted = 1;
         }
         canProceed = 1;
     } while (userChoice->isStoryNext == 0 || canProceed == 0);
