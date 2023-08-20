@@ -306,20 +306,11 @@ Story *addTreeNode(char description[])
 
 void createStory()
 {
-    rootNode = addTreeNode(" You are in a dark room. There is a door to your left and right. What will you do?");
-
-    addChoice(rootNode, " Search the room", 0, " You find a key", "Key", 0);
-    addChoice(rootNode, " Open the door", 1, " You need a key to open the door", "Key", 0);
-
-    Story *node1 = addTreeNode(" You find yourself in a forest. There is a wolf in front of you. Behind you is another door. What do you do?");
-    addChoice(node1, " Fight the wolf", 0, " You fought the wolf and lost. You lost a life", "", 1);
-    addChoice(node1, " Run towards the door", 1, " You need a key to open the door", "", 0);
-    rootNode->choice1 = node1;
-
-    Story *node2 = addTreeNode(" You enter a room with a mirror. You see a shadow behind you. What do you do?");
-    addChoice(node2, " Smash the mirror", 0, " You found key in the mirror", "Key", 0);
-    addChoice(node2, " Run away from the room", 1, "", "Key", 0);
-    node1->choice1 = node2;
+    rootNode = addTreeNode(" You open your eyes slowly. You wake up in the bed. You are unware of who you are and what are you doing in the place.\n You find yourself in a dimly lit room with a locked door just like a prison. You are laying on a bed and there is a \n portrait of a little child");
+    		   addChoice(rootNode,"Look around the room",0,"You found a big stone under the bed","Stone",0);
+    		   addChoice(rootNode,"Break the door",1,"You can't break the door with hand","Stone",0);
+    		   
+    Story* node1 = addTreeNode(" You break the door with the stone and exit into the passage. You see a multiple rooms similar to thr room you had\n escaped from. You see two doors on two sides of the passage.");
 }
 
 Story *searchNodeByID(Story *currentStory, int targetID)
