@@ -306,20 +306,24 @@ Story *addTreeNode(char description[])
 
 void createStory()
 {
-    rootNode = addTreeNode(" You are in a dark room. There is a door to your left and right. What will you do?");
+    rootNode = addTreeNode(" You hear ticking of clock. You slowly open your eyes and find yourself in a dark room. There is nothing instead of\n broken plasters of wall, a door which is locked and the ticking clock. You are unaware about who you are and where\n you are. ");
+    addChoice(rootNode, "Look around the room", 0, "You found a brick under the bed", "Brick", 0);
+    addChoice(rootNode, "Break the door", 1, "You can't break door with hand", "", 0);
 
-    addChoice(rootNode, " Search the room", 0, " You find a key", "Key", 0);
-    addChoice(rootNode, " Open the door", 1, " You need a key to open the door", "Key", 0);
-
-    Story *node1 = addTreeNode(" You find yourself in a forest. There is a wolf in front of you. Behind you is another door. What do you do?");
-    addChoice(node1, " Fight the wolf", 0, " You fought the wolf and lost. You lost a life", "", 1);
-    addChoice(node1, " Run towards the door", 1, " You need a key to open the door", "", 0);
+    Story *node1 = addTreeNode(" After breaking the door you exit the room and enter a big hallway. the hallway is mostly empty and a small bulb is\n providing light enough to navigate around the room. At the end of the hallway there are two doors one is rusted and\n another looks like it is just bought and attached. ");
+    addChoice(node1, "Open the rusted door", 1, "", "", 0);
+    addChoice(node1, "Open the new door", 1, "", "", 0);
     rootNode->choice1 = node1;
 
-    Story *node2 = addTreeNode(" You enter a room with a mirror. You see a shadow behind you. What do you do?");
-    addChoice(node2, " Smash the mirror", 0, " You found key in the mirror", "Key", 0);
-    addChoice(node2, " Run away from the room", 1, "", "Key", 0);
+    Story *node2 = addTreeNode(" You open the door and you saw a strange shadow standing infront of you. You are afraid and try to run away but the door was already closed and locked. You looked around and see a piece of steel pipe. ");
+    addChoice(node2, "Pick up the steel pipe", 1, "You picked up the pipe", "Pipe", 0);
+    addChoice(node2, "Beat the shadow", 0, "The shadow had a gun and it shot you", "Pipe", 1);
     node1->choice1 = node2;
+
+    Story *node3;
+    node1->choice2 = node3;
+
+    Story *node4 = addTreeNode(" The shadow person is pushed to corner and became unconscious. It dropped the gun that it was carrying");
 }
 
 Story *searchNodeByID(Story *currentStory, int targetID)
@@ -425,7 +429,7 @@ void playGame(Story *currentStory)
             {
                 if (!isItemPresent(userChoice->inventoryItem))
                 {
-                    sprintf(message, "You need %s to complete this action", userChoice->inventoryItem);
+                    sprintf(message, "%s !!!\n !!! You need %s to complete this action", userChoice->message, userChoice->inventoryItem);
                     continue;
                 }
                 deleteItem(userChoice->inventoryItem);
@@ -506,13 +510,23 @@ void startScreen()
     case 1:
         if (file != NULL)
         {
-            Story *currentStory = loadGameProgress();
-            fclose(file);
-            playGame(currentStory);
+            fseek(file, 0, SEEK_END); // move to end of file
+            if (ftell(file) == 0)     // if position is still at the beginning, the file is empty
+            {
+                printf("\n No saved file found");
+            }
+            else
+            {
+                rewind(file); // move back to the start of the file
+                Story *currentStory = loadGameProgress();
+                fclose(file);
+                playGame(currentStory);
+                printf("File is not empty.\n");
+            }
         }
         else
         {
-            printf("\n No saved file found");
+            printf("\n An error occured while opening the file");
         }
     case 2:
         playGame(rootNode);
