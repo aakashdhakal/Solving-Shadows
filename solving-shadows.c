@@ -87,7 +87,7 @@ void displayChoice(Choice *node)
     while (temp != NULL)
     {
         temp->choiceNumber = i;
-        printf(" %d. %s\n", temp->choiceNumber, temp->choice);
+        printf(" %d. %s\n\n", temp->choiceNumber, temp->choice);
         temp = temp->nextChoice;
         i++;
         numberOfChoices++;
@@ -220,7 +220,7 @@ int isItemPresent(char *item)
     Inventory *temp = inventoryHead;
     while (temp != NULL)
     {
-        if (strcmp(temp->itemName, item) == 0 || item == NULL)
+        if (strcmp(temp->itemName, item) == 0)
         {
             return 1;
         }
@@ -245,16 +245,22 @@ void gameOver()
 {
     system("cls");
     printf(R"EOF(
-                                 ____                         ___                 
-                                / ___| __ _ _ __ ___   ___   / _ \__   _____ _ __ 
-                               | |  _ / _  |  _   _ \ / _ \ | | | \ \ / / _ \ '__|
-                               | |_| | (_| | | | | | |  __/ | |_| |\ V /  __/ |   
-                                \____|\__,_|_| |_| |_|\___|  \___/  \_/ \___|_|                                        
+
+    
+                            ___   ___  ___  ___  ____      ___   __ __  ____ ____ 
+                           // \\ // \\ ||\\//|| ||        // \\  || || ||    || \\
+                          (( ___ ||=|| || \/ || ||==     ((   )) \\ // ||==  ||_//
+                           \\_|| || || ||    || ||___     \\_//   \V/  ||___ || \\
+
+                                                         
+                                      
 )EOF");
     vline('-', 120);
     printf(" !!! %s !!!\n", message);
     printf("\n 1. New Game\n\n 2. Reload last checkpoint\n\n 3. Quit to Main Menu\n");
     int choice;
+    lives = 3;
+    strcpy(message, "");
     printf("\n Enter your choice: ");
     scanf("%d", &choice);
     switch (choice)
@@ -274,8 +280,8 @@ void gameOver()
 // Function to update the status bar
 void updateConsole()
 {
-    //    printf("\033[2J\033[1;1H");
     system("cls");
+
     if (lives == 0)
     {
         strcpy(message, " You have lost all your lives");
@@ -311,7 +317,7 @@ void createStory()
 
     Story *node1 = addTreeNode(" After breaking the door you exit the room and enter a big hallway. the hallway is mostly empty and a small bulb is\n providing light enough to navigate around the room. At the end of the hallway there are two doors one is rusted and\n another looks like it is just bought and attached. ");
     addChoice(node1, "Open the rusted door", 1, "", "", 0);
-    addChoice(node1, "Open the new door", 1, "", "", 0);
+    addChoice(node1, "Open the new door", 2, "", "", 0);
     rootNode->choice1 = node1;
 
     Story *node2 = addTreeNode(" You open the door and you saw a strange shadow standing infront of you. You are afraid and try to run away but the door was already closed and locked. You looked around and see a piece of steel pipe. ");
@@ -319,26 +325,34 @@ void createStory()
     addChoice(node2, "Beat the shadow", 1, "The shadow had a gun and it shot you", "Pipe", 1);
     node1->choice1 = node2;
 
-    Story *node3 = addTreeNode(" You escaped the shadow but when you were running you saw something familiar about the shadow. While running suddenly\nthe floor breaks and you fall down. It looks like you are in someone's bedroom. ");
-    addChoice(node3, "Look around the room", 0, "You found a key under the bed", "Key", 0);
-    addChoice(node3, "Open the door", 1, "The door is locked", "Key", 0);
+    Story *node3 = addTreeNode(" You escaped the shadow but when you were running you saw something familiar about the shadow. While running suddenly\n the floor breaks and you fall down. It looks like you are in someone's bedroom. The only way out was a vent on the\n bottom of the wall. ");
+    addChoice(node3, "Look around the room", 0, "You found a key under the bed", "Screwdriver", 0);
+    addChoice(node3, "Open the vent", 1, "You cannot open the vent without a screwdriver", "Screwdriver", 0);
     node2->choice1 = node3;
 
-    Story *node4 = addTreeNode("When you are running toward the door you heard somebody calling you. When you turn back you saw the same shadow you beatearlier. You are confused and afraid. The shadow slowly comes to the light and you saw the shadow is actually you. You are shocked and confused.");
-    addChoice(node4, "Talk to the shadow", 1, "", "", 0);
-    addChoice(node4, "Shoot Him", 1, "You cannot shoot without a gun", "Gun", 0);
+    Story *node4 = addTreeNode(" You open the vent and crawl through it. After crawling for some time you see a light coming from the end of the vent.\n You crawl towards the light and you arrive a room with a rusted door");
+    addChoice(node4, "Open the door", 1, "", "", 0);
     node3->choice1 = node4;
 
-    Story *node6 = addTreeNode("You open the new door and you found yourself in some futuristic room. There is a computer on the table and a\nwindow. You look outside the window and you saw a big city. You are confused and afraid. You look around and see\na gun on the table. ");
-    addChoice(node6, "Pick up the gun", 0, "You picked up the gun", "Gun", 0);
+    Story *node5 = addTreeNode("When you were going to open the door a person suddenly opens the door ");
+    addChoice(node5, "Shoot Him", 1, "You don't have a gun so the person beat you with pipe", "Gun", 1);
+    addChoice(node5, "Retry and start again", 2, "", "", 0);
+    node4->choice1 = node5;
+    node5->choice2 = rootNode;
+
+    Story *node12 = addTreeNode(" Before you shoot him he hit you with a pipe and you fall down. After some time you wake up in the same room where you started");
+    addChoice(node12, "Continue", 1, "", "", 0);
+    node5->choice1 = node12;
+
+    Story *node6 = addTreeNode(" You open the new door and you found yourself in some futuristic room. There is a computer on the table and a window.\n You look outside the window and you saw a big city. You are confused and afraid. You look around and see a gun on\n the table. ");
     addChoice(node6, "Look at the computer", 1, "", "", 0);
     node1->choice2 = node6;
 
-    Story *node7 = addTreeNode("You look at the computer and you found a message. The message says \"You are in a simulation. You are the only\none who can save the world. You have to find the key to exit the simulation. The key is hidden in the room. You\nhave to find it and exit the simulation");
+    Story *node7 = addTreeNode(" You look at the computer and you found a message. The message says \"You are in a simulation. You are the only one who\n can save the world. You have to find the key to exit the simulation. The key is hidden in the room. You have to\n find it and exit the simulation");
     addChoice(node7, "Look around the room", 1, "", "", 0);
     node6->choice1 = node7;
 
-    Story *node8 = addTreeNode("You found a safe in a corner. There is a message in the safe that says 'If you get any incorrect 5 digits password combination then you will die. So you look around the room and found a note on the table. The note says 'If we place an extra numeral 1 at the beginning, we get a number three times smaller than if we put that numeral 1 at the end of the number'. So what is the password?");
+    Story *node8 = addTreeNode(" You found a safe in a corner. There is a message in the safe that says 'If you get any incorrect 5 digits password\n combination then you will die. So you look around the room and found a note on the table. The note says 'If we place an\n extra numeral 1 at the beginning, we get a number three times smaller than if we put that numeral 1 at the end of the\n number'. So what is the password?");
     addChoice(node8, "12345", 0, "You entered the wrong password and you died", "", 1);
     addChoice(node8, "82374", 0, "You entered the wrong password and you died", "", 1);
     addChoice(node8, "42857", 1, "You entered the wrong password and you died", "", 0);
@@ -347,12 +361,18 @@ void createStory()
     addChoice(node8, "57142", 0, "You entered the wrong password and you died", "", 1);
     node7->choice1 = node8;
 
-    Story *node9 = addTreeNode("The password is correct and the safe opens. You found a key in the safe. You take the key and exit the room. You\nare back in the hallway. You look around and see a door with a lock. You try to open the door with the key and\nthe door opens. You enter the room and you see a big computer.");
+    Story *node9 = addTreeNode(" The password is correct and the safe opens. You found a key in the safe. You take the key and exit the room. You\n are back in the hallway. You look around and see a door with a lock. You try to open the door with the key and\n the door opens. You enter the room and you see a big computer.");
     addChoice(node9, "Try to exit the simulation", 1, "", "", 0);
-    addChoice(node9, "Destroy the computer with gun", 1, "You don't have gun right now", "Gun", 0);
-    node7->choice2 = node9;
+    addChoice(node9, "Destroy the computer with gun", 2, "You don't have gun right now", "Gun", 0);
+    node8->choice1 = node9;
 
     Story *node10 = addTreeNode("You try to exit the simulation but you suddenly passed out and you wake up ine same room where you started");
+    addChoice(node10, "Continue", 1, "", "", 0);
+    node9->choice1 = node10;
+
+    Story *node11 = addTreeNode("You destroy the computer and suddenly you passed out and you wake up in same room where you started");
+    addChoice(node11, "Continue", 1, "", "", 0);
+    node9->choice2 = node11;
 }
 
 Story *searchNodeByID(Story *currentStory, int targetID)
@@ -418,6 +438,8 @@ void playGame(Story *currentStory)
     Story *nextStory = NULL;
     int choice;
     int canProceed = 0;
+    pushCheckpoint(currentStory);
+
     do
     {
         updateConsole();
@@ -444,6 +466,11 @@ void playGame(Story *currentStory)
                 break;
             }
             userChoice = userChoice->nextChoice;
+        }
+        if (userChoice->isLifeDecrease == 1)
+        {
+            strcpy(message, userChoice->message);
+            lives--;
         }
 
         if (userChoice->isCompleted == 1 && userChoice->isLifeDecrease != 1)
@@ -481,24 +508,21 @@ void playGame(Story *currentStory)
                 addItem(userChoice->inventoryItem);
             }
 
-            if (userChoice->isLifeDecrease == 1)
-            {
-                lives--;
-            }
             userChoice->isCompleted = 1;
         }
+
         canProceed = 1;
     } while (userChoice->isStoryNext == 0 || canProceed == 0);
 
     if (nextStory == NULL)
     {
         strcpy(message, " You have completed the game");
+
         gameOver();
         saveGameProgress(rootNode);
         return;
     }
 
-    pushCheckpoint(currentStory);
     saveGameProgress(nextStory);
     playGame(nextStory);
 }
@@ -516,13 +540,12 @@ void helpScreen()
 void gameTitle()
 {
     printf(R"EOF(
-                      
-                       ____   ____  ___  __    __ ______ _  _    ____  __ ____   ____   __     ____
-                       || \\ ||    // \\ ||    || | || | \\//    || \\ || || \\  || \\  ||    ||   
-                       ||_// ||==  ||=|| ||    ||   ||    )/     ||_// || ||  )) ||  )) ||    ||== 
-                       || \\ ||___ || || ||__| ||   ||   //      || \\ || ||_//  ||_//  ||__| ||___
-                                                                             
-                                                                                                                                    
+                                         ____  __    ___  ___  ____   ____
+                                        ||    (( \  //   // \\ || \\ ||   
+                                        ||==   \\  ((    ||=|| ||_// ||== 
+                                        ||___ \_))  \\__ || || ||    ||___
+
+
 )EOF");
     vline('-', 120);
 }

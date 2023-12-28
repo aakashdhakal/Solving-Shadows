@@ -1,0 +1,1 @@
+    strcpy(message, "Checkpoint saved");
